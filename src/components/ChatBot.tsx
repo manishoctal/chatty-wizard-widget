@@ -13,9 +13,20 @@ interface Message {
 }
 
 export const ChatBot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "welcome-1",
+      content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
+      sender: "bot",
+    },
+    {
+      id: "welcome-2",
+      content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
+      sender: "bot",
+    }
+  ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
