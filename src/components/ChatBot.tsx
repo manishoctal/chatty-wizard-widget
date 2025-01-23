@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -18,6 +19,7 @@ export const ChatBot = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,26 +32,48 @@ export const ChatBot = () => {
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    const newMessage: Message = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: inputValue,
       sender: "user",
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://your-python-backend-url/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userMessage.content }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from the server');
+      }
+
+      const data = await response.json();
+      
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Thank you for your message! This is a demo response.",
+        content: data.response,
         sender: "bot",
       };
+
       setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to get response from the chatbot. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Error:', error);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -112,8 +136,8 @@ export const ChatBot = () => {
                   className={cn(
                     "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in",
                     message.sender === "user"
-                      ? "bg-chat-bubble-user text-white"
-                      : "bg-chat-bubble-bot"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
                   )}
                 >
                   {message.content}
@@ -122,11 +146,11 @@ export const ChatBot = () => {
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-chat-bubble-bot rounded-2xl px-4 py-2 animate-fade-in">
+                <div className="bg-muted rounded-2xl px-4 py-2 animate-fade-in">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-gray-500 animate-typing-dot" />
-                    <span className="w-2 h-2 rounded-full bg-gray-500 animate-typing-dot [animation-delay:0.2s]" />
-                    <span className="w-2 h-2 rounded-full bg-gray-500 animate-typing-dot [animation-delay:0.4s]" />
+                    <span className="w-2 h-2 rounded-full bg-foreground/50 animate-typing-dot" />
+                    <span className="w-2 h-2 rounded-full bg-foreground/50 animate-typing-dot [animation-delay:0.2s]" />
+                    <span className="w-2 h-2 rounded-full bg-foreground/50 animate-typing-dot [animation-delay:0.4s]" />
                   </div>
                 </div>
               </div>
