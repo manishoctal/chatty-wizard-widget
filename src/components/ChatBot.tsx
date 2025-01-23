@@ -43,47 +43,34 @@ export const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      const response = await fetch('https://octal-chat-bot.octallabs.com/api/chat', {
+      const response = await fetch('https://octal-chat-bot.octallabs.com/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': window.location.origin
         },
-        mode: 'cors',
-        credentials: 'include',
         body: JSON.stringify({ query: userMessage.content }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to get response from the server');
+        throw new Error('Failed to get response from the server');
       }
 
       const data = await response.json();
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.reply || "I apologize, but I couldn't process your request at the moment.",
+        content: data.reply,
         sender: "bot",
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to get response from the chatbot. Please try again.",
+        description: "Failed to get response from the chatbot. Please try again.",
         variant: "destructive",
       });
-      
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: "I apologize, but I'm having trouble connecting to the server. Please try again later.",
-        sender: "bot",
-      };
-      
-      setMessages((prev) => [...prev, errorMessage]);
+      console.error('Error:', error);
     } finally {
       setIsTyping(false);
     }
