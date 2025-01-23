@@ -43,12 +43,12 @@ export const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://your-python-backend-url/chat', {
+      const response = await fetch('https://octal-chat-bot.octallabs.com/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage.content }),
+        body: JSON.stringify({ query: userMessage.content }),
       });
 
       if (!response.ok) {
@@ -59,7 +59,7 @@ export const ChatBot = () => {
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: data.reply,
         sender: "bot",
       };
 
