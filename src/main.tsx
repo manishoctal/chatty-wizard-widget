@@ -5,23 +5,18 @@ import App from './App';
 import './index.css';
 
 // Check if running in widget mode
-const widgetContainer = document.getElementById('octal-chatbot-widget');
-const root = ReactDOM.createRoot(
-  widgetContainer || document.getElementById('root')!
-);
+const widgetContainer = document.getElementById('lovable-chatbot-widget');
+const rootElement = widgetContainer || document.getElementById('root');
 
-// If in widget mode, only render the ChatBot component
-if (widgetContainer) {
-  root.render(
-    <React.StrictMode>
-      <ChatBot />
-    </React.StrictMode>
-  );
-} else {
-  // Regular app mode - render the full application
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+if (!rootElement) {
+  throw new Error('Root element not found');
 }
+
+const root = ReactDOM.createRoot(rootElement);
+
+// Render only ChatBot in widget mode, full App otherwise
+root.render(
+  <React.StrictMode>
+    {widgetContainer ? <ChatBot /> : <App />}
+  </React.StrictMode>
+);

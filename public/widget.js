@@ -1,24 +1,35 @@
 (function() {
   // Create widget container
   const container = document.createElement('div');
-  container.id = 'octal-chatbot-widget';
+  container.id = 'lovable-chatbot-widget';
   document.body.appendChild(container);
 
   // Load required styles
   const linkElement = document.createElement('link');
   linkElement.rel = 'stylesheet';
-  linkElement.href = 'https://744a4ff2-e35c-4bed-ba3a-135e5179f1ca.lovableproject.com/src/index.css';
+  linkElement.href = 'YOUR_DEPLOYED_URL/index.css';
   document.head.appendChild(linkElement);
 
-  // Load the widget
-  const script = document.createElement('script');
-  script.src = 'https://744a4ff2-e35c-4bed-ba3a-135e5179f1ca.lovableproject.com/src/main.tsx';
-  script.type = 'module';
-  document.body.appendChild(script);
+  // Load React and ReactDOM
+  const loadScript = (src) => {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+  };
 
-  // Load GPT Engineer script (required for the widget)
-  const gptScript = document.createElement('script');
-  gptScript.src = 'https://cdn.gpteng.co/gptengineer.js';
-  gptScript.type = 'module';
-  document.body.appendChild(gptScript);
+  // Load dependencies and initialize widget
+  Promise.all([
+    loadScript('https://unpkg.com/react@18/umd/react.production.min.js'),
+    loadScript('https://unpkg.com/react-dom@18/umd/react-dom.production.min.js')
+  ]).then(() => {
+    // Load the widget
+    const script = document.createElement('script');
+    script.src = 'YOUR_DEPLOYED_URL/main.js';
+    script.type = 'module';
+    document.body.appendChild(script);
+  });
 })();
