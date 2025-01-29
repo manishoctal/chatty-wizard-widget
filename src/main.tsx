@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChatBot } from './components/ChatBot';
+import App from './App';
 import './index.css';
 
 // Check if running in widget mode
