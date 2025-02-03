@@ -12,6 +12,12 @@ interface Message {
   sender: "user" | "bot";
 }
 
+// Function to convert markdown-style links to HTML
+const convertLinksToHTML = (text: string) => {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  return text.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+};
+
 export const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -150,9 +156,10 @@ export const ChatBot = () => {
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
-                >
-                  {message.content}
-                </div>
+                  dangerouslySetInnerHTML={{
+                    __html: convertLinksToHTML(message.content)
+                  }}
+                />
               </div>
             ))}
             {isTyping && (

@@ -1,0 +1,19 @@
+{
+  "name": "lovable-chat-widget",
+  "version": "1.0.0",
+  "description": "A customizable chat widget built with React",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
