@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { MessageSquare, Send, Minus, X } from "lucide-react";
+import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,6 +16,11 @@ interface Message {
 const convertLinksToHTML = (text: string) => {
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   return text.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+};
+
+// Function to generate a new session ID
+const generateSessionId = () => {
+  return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 };
 
 export const ChatBot = () => {
@@ -35,6 +40,7 @@ export const ChatBot = () => {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [sessionId, setSessionId] = useState(generateSessionId());
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -65,7 +71,10 @@ export const ChatBot = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: userMessage.content }),
+        body: JSON.stringify({ 
+          query: userMessage.content,
+          session_id: sessionId 
+        }),
       });
 
       if (!response.ok) {
@@ -100,6 +109,27 @@ export const ChatBot = () => {
     }
   };
 
+  const handleRestartChat = () => {
+    const newSessionId = generateSessionId();
+    setSessionId(newSessionId);
+    setMessages([
+      {
+        id: "welcome-1",
+        content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
+        sender: "bot",
+      },
+      {
+        id: "welcome-2",
+        content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
+        sender: "bot",
+      }
+    ]);
+    toast({
+      title: "Chat Restarted",
+      description: "A new chat session has been started.",
+    });
+  };
+
   if (!isOpen) {
     return (
       <Button
@@ -119,6 +149,15 @@ export const ChatBot = () => {
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="font-semibold">Chat Support</h2>
         <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleRestartChat}
+            title="Restart Chat"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
