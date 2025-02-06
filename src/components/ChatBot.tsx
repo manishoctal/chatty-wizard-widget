@@ -208,15 +208,19 @@ export const ChatBot = () => {
               >
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in",
+                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in whitespace-pre-wrap",
                     message.sender === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
-                  dangerouslySetInnerHTML={{
-                    __html: convertToHTML(message.content)
-                  }}
-                />
+                >
+                  <div 
+                    className="chat-message" 
+                    dangerouslySetInnerHTML={{
+                      __html: convertToHTML(message.content)
+                    }}
+                  />
+                </div>
               </div>
             ))}
             {isTyping && (
