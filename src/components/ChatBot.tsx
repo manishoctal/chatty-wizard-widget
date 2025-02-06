@@ -33,7 +33,10 @@ const convertToHTML = (text: string) => {
   // Remove leading <br> if it exists
   formattedText = formattedText.replace(/^<br>/, '');
   
-  return formattedText;
+  // Parse and sanitize HTML content
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(formattedText, 'text/html');
+  return doc.body.innerHTML;
 };
 
 // Function to generate a new session ID
@@ -208,14 +211,14 @@ export const ChatBot = () => {
               >
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in whitespace-pre-wrap",
+                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in",
                     message.sender === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
                 >
                   <div 
-                    className="chat-message" 
+                    className="chat-message prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{
                       __html: convertToHTML(message.content)
                     }}
