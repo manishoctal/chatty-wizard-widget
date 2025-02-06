@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +13,27 @@ interface Message {
   sender: "user" | "bot";
 }
 
-// Function to convert markdown-style links to HTML
-const convertLinksToHTML = (text: string) => {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  return text.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+// Function to convert markdown-style formatting to HTML
+const convertToHTML = (text: string) => {
+  // First, handle line breaks
+  let formattedText = text.replace(/\\n/g, '<br>');
+  
+  // Handle numbered lists
+  formattedText = formattedText.replace(/(\d+)\.\s/g, '<br>$1. ');
+  
+  // Handle bullet points
+  formattedText = formattedText.replace(/•\s/g, '<br>• ');
+  
+  // Handle markdown-style links
+  formattedText = formattedText.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g, 
+    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>'
+  );
+  
+  // Remove leading <br> if it exists
+  formattedText = formattedText.replace(/^<br>/, '');
+  
+  return formattedText;
 };
 
 // Function to generate a new session ID
@@ -196,7 +214,7 @@ export const ChatBot = () => {
                       : "bg-muted"
                   )}
                   dangerouslySetInnerHTML={{
-                    __html: convertLinksToHTML(message.content)
+                    __html: convertToHTML(message.content)
                   }}
                 />
               </div>
