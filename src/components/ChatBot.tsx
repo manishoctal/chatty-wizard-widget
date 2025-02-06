@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import DOMPurify from "dompurify";
 
 interface Message {
   id: string;
@@ -36,12 +36,7 @@ const convertToHTML = (text: string) => {
   // Parse and sanitize HTML content
   const parser = new DOMParser();
   const doc = parser.parseFromString(formattedText, 'text/html');
-  
-  // Sanitize the HTML using DOMPurify
-  return DOMPurify.sanitize(doc.body.innerHTML, {
-    ALLOWED_TAGS: ['br', 'a', 'p', 'span', 'div', 'strong', 'em', 'ul', 'ol', 'li'],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
-  });
+  return doc.body.innerHTML;
 };
 
 // Function to generate a new session ID
