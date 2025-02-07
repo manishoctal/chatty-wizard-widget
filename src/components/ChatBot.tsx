@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import DOMPurify from "dompurify";
 
 interface Message {
   id: string;
@@ -12,10 +13,32 @@ interface Message {
   sender: "user" | "bot";
 }
 
-// Function to convert markdown-style links to HTML
-const convertLinksToHTML = (text: string) => {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  return text.replace(linkRegex, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>');
+const sanitizeHTML = (content: string) => {
+  // Format numbered lists and links into proper HTML
+  const formattedContent = content
+    .split('\n')
+    .map(line => {
+      // Check if line starts with a number followed by a dot
+      if (/^\d+\./.test(line.trim())) {
+        return `<li>${line.trim().replace(/^\d+\.\s*/, '')}</li>`;
+      }
+      return line;
+    })
+    .join('\n');
+
+  // Wrap the content in proper HTML tags
+  const wrappedContent = `
+    <div>
+      <ol>
+        ${formattedContent}
+      </ol>
+    </div>
+  `;
+
+  return DOMPurify.sanitize(wrappedContent, {
+    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
+    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
+  });
 };
 
 // Function to generate a new session ID
@@ -195,10 +218,14 @@ export const ChatBot = () => {
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
-                  dangerouslySetInnerHTML={{
-                    __html: convertLinksToHTML(message.content)
-                  }}
-                />
+                >
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(message.content)
+                    }}
+                  />
+                </div>
               </div>
             ))}
             {isTyping && (
