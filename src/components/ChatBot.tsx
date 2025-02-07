@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import sanitizeHtml from "sanitize-html";
+import DOMPurify from "dompurify";
 
 interface Message {
   id: string;
@@ -15,27 +15,9 @@ interface Message {
 }
 
 const sanitizeHTML = (content: string) => {
-  // Clean and format the HTML content
-  return sanitizeHtml(content, {
-    allowedTags: ["p", "a", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div", "span"],
-    allowedAttributes: {
-      'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt'],
-      '*': ['class']
-    },
-    transformTags: {
-      'a': (tagName, attribs) => {
-        return {
-          tagName,
-          attribs: {
-            ...attribs,
-            'class': 'text-blue-500 hover:text-blue-700 underline',
-            'target': '_blank',
-            'rel': 'noopener noreferrer'
-          }
-        };
-      }
-    }
+  return DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br"],
+    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
   });
 };
 
@@ -50,17 +32,12 @@ export const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome-1",
-      content: `
-        <div>
-          👋 Hi there! I'm your AI assistant. Here's what I can do:
-          <ul>
-            <li><strong>Format text</strong> in different ways</li>
-            <li>Create <em>styled</em> content</li>
-            <li>Share <a href="https://example.com">clickable links</a></li>
-          </ul>
-          How can I help you today?
-        </div>
-      `,
+      content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
+      sender: "bot",
+    },
+    {
+      id: "welcome-2",
+      content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
       sender: "bot",
     }
   ]);
@@ -141,17 +118,12 @@ export const ChatBot = () => {
     setMessages([
       {
         id: "welcome-1",
-        content: `
-          <div>
-            👋 Hi there! I'm your AI assistant. Here's what I can do:
-            <ul>
-              <li><strong>Format text</strong> in different ways</li>
-              <li>Create <em>styled</em> content</li>
-              <li>Share <a href="https://example.com">clickable links</a></li>
-            </ul>
-            How can I help you today?
-          </div>
-        `,
+        content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
+        sender: "bot",
+      },
+      {
+        id: "welcome-2",
+        content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
         sender: "bot",
       }
     ]);
