@@ -6,12 +6,20 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import DOMPurify from "dompurify";
 
 interface Message {
   id: string;
   content: string;
   sender: "user" | "bot";
 }
+
+const sanitizeHTML = (content: string) => {
+  return DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br"],
+    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
+  });
+};
 
 // Function to generate a new session ID
 const generateSessionId = () => {
@@ -185,13 +193,18 @@ export const ChatBot = () => {
               >
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in whitespace-pre-wrap",
+                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in",
                     message.sender === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
                 >
-                  {message.content}
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(message.content)
+                    }}
+                  />
                 </div>
               </div>
             ))}
