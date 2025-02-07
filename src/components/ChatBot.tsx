@@ -13,32 +13,6 @@ interface Message {
   sender: "user" | "bot";
 }
 
-// Function to convert markdown-style formatting to HTML
-const convertToHTML = (text: string) => {
-  // First, handle line breaks
-  let formattedText = text.replace(/\\n/g, '<br>');
-  
-  // Handle numbered lists
-  formattedText = formattedText.replace(/(\d+)\.\s/g, '<br>$1. ');
-  
-  // Handle bullet points
-  formattedText = formattedText.replace(/•\s/g, '<br>• ');
-  
-  // Handle markdown-style links
-  formattedText = formattedText.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g, 
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">$1</a>'
-  );
-  
-  // Remove leading <br> if it exists
-  formattedText = formattedText.replace(/^<br>/, '');
-  
-  // Parse and sanitize HTML content
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(formattedText, 'text/html');
-  return doc.body.innerHTML;
-};
-
 // Function to generate a new session ID
 const generateSessionId = () => {
   return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -211,18 +185,13 @@ export const ChatBot = () => {
               >
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in",
+                    "max-w-[80%] rounded-2xl px-4 py-2 animate-fade-in whitespace-pre-wrap",
                     message.sender === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
                 >
-                  <div 
-                    className="chat-message prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: convertToHTML(message.content)
-                    }}
-                  />
+                  {message.content}
                 </div>
               </div>
             ))}
