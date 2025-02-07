@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import DOMPurify from "dompurify";
+import sanitizeHtml from "sanitize-html";
 
 interface Message {
   id: string;
@@ -35,9 +36,26 @@ const sanitizeHTML = (content: string) => {
     </div>
   `;
 
-  return DOMPurify.sanitize(wrappedContent, {
-    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
-    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
+  return sanitizeHtml(wrappedContent, {
+    allowedTags: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
+    allowedAttributes: {
+      'a': ['href', 'target', 'rel'],
+      'img': ['src', 'alt'],
+      '*': ['class']
+    },
+    transformTags: {
+      'a': (tagName, attribs) => {
+        return {
+          tagName,
+          attribs: {
+            ...attribs,
+            'class': 'text-blue-500 hover:text-blue-700 underline',
+            'target': '_blank',
+            'rel': 'noopener noreferrer'
+          }
+        };
+      }
+    }
   });
 };
 
