@@ -6,40 +6,25 @@ import { MessageSquare, Send, Minus, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import DOMPurify from "dompurify";
-
+import sanitizeHtml from 'sanitize-html';
 interface Message {
   id: string;
   content: string;
   sender: "user" | "bot";
 }
-
-const sanitizeHTML = (content: string) => {
-  // Format numbered lists and links into proper HTML
-  const formattedContent = content
-    .split('\n')
-    .map(line => {
-      // Check if line starts with a number followed by a dot
-      if (/^\d+\./.test(line.trim())) {
-        return `<li>${line.trim().replace(/^\d+\.\s*/, '')}</li>`;
-      }
-      return line;
-    })
-    .join('\n');
-
-  // Wrap the content in proper HTML tags
-  const wrappedContent = `
-    <div>
-      <ol>
-        ${formattedContent}
-      </ol>
-    </div>
-  `;
-
-  return DOMPurify.sanitize(wrappedContent, {
-    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
-    ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
+ 
+function sanitizeInput(html) {
+  return sanitizeHtml(html, {
+    allowedTags: ['b', 'strong', 'p', 'a', 'ul', 'li'],
+    allowedAttributes: {
+      'a': ['href']
+    },
+    transformTags: {
+      'a': sanitizeHtml.simpleTransform('a', { target: '_blank', rel: 'noopener noreferrer' })
+    }
   });
-};
+}
+
 
 // Function to generate a new session ID
 const generateSessionId = () => {
@@ -185,7 +170,7 @@ export const ChatBot = () => {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => setIsMinimized(!isMinimized)}
+            onClick={() => sanitizeInput(!isMinimized)}
           >
             <Minus className="h-4 w-4" />
           </Button>
@@ -222,7 +207,7 @@ export const ChatBot = () => {
                   <div 
                     className="prose prose-sm dark:prose-invert max-w-none"
                     dangerouslySetInnerHTML={{
-                      __html: sanitizeHTML(message.content)
+                      __html: sanitizeHtml(message.content)
                     }}
                   />
                 </div>
