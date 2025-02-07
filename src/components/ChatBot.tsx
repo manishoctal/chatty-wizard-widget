@@ -15,29 +15,9 @@ interface Message {
 }
 
 const sanitizeHTML = (content: string) => {
-  // Format numbered lists and links into proper HTML
-  const formattedContent = content
-    .split('\n')
-    .map(line => {
-      // Check if line starts with a number followed by a dot
-      if (/^\d+\./.test(line.trim())) {
-        return `<li>${line.trim().replace(/^\d+\.\s*/, '')}</li>`;
-      }
-      return line;
-    })
-    .join('\n');
-
-  // Wrap the content in proper HTML tags
-  const wrappedContent = `
-    <div>
-      <ol>
-        ${formattedContent}
-      </ol>
-    </div>
-  `;
-
-  return sanitizeHtml(wrappedContent, {
-    allowedTags: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
+  // Clean and format the HTML content
+  return sanitizeHtml(content, {
+    allowedTags: ["p", "a", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div", "span"],
     allowedAttributes: {
       'a': ['href', 'target', 'rel'],
       'img': ['src', 'alt'],
@@ -70,12 +50,17 @@ export const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome-1",
-      content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
-      sender: "bot",
-    },
-    {
-      id: "welcome-2",
-      content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
+      content: `
+        <div>
+          👋 Hi there! I'm your AI assistant. Here's what I can do:
+          <ul>
+            <li><strong>Format text</strong> in different ways</li>
+            <li>Create <em>styled</em> content</li>
+            <li>Share <a href="https://example.com">clickable links</a></li>
+          </ul>
+          How can I help you today?
+        </div>
+      `,
       sender: "bot",
     }
   ]);
@@ -156,12 +141,17 @@ export const ChatBot = () => {
     setMessages([
       {
         id: "welcome-1",
-        content: "👋 Hi there! I'm your AI assistant. How can I help you today?",
-        sender: "bot",
-      },
-      {
-        id: "welcome-2",
-        content: "Feel free to ask me anything about our services, products, or any other questions you might have!",
+        content: `
+          <div>
+            👋 Hi there! I'm your AI assistant. Here's what I can do:
+            <ul>
+              <li><strong>Format text</strong> in different ways</li>
+              <li>Create <em>styled</em> content</li>
+              <li>Share <a href="https://example.com">clickable links</a></li>
+            </ul>
+            How can I help you today?
+          </div>
+        `,
         sender: "bot",
       }
     ]);
