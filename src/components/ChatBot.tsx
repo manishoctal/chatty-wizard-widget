@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +14,29 @@ interface Message {
 }
 
 const sanitizeHTML = (content: string) => {
-  return DOMPurify.sanitize(content, {
-    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br"],
+  // Format numbered lists and links into proper HTML
+  const formattedContent = content
+    .split('\n')
+    .map(line => {
+      // Check if line starts with a number followed by a dot
+      if (/^\d+\./.test(line.trim())) {
+        return `<li>${line.trim().replace(/^\d+\.\s*/, '')}</li>`;
+      }
+      return line;
+    })
+    .join('\n');
+
+  // Wrap the content in proper HTML tags
+  const wrappedContent = `
+    <div>
+      <ol>
+        ${formattedContent}
+      </ol>
+    </div>
+  `;
+
+  return DOMPurify.sanitize(wrappedContent, {
+    ALLOWED_TAGS: ["p", "a", "img", "ul", "ol", "li", "strong", "em", "h1", "h2", "h3", "h4", "h5", "h6", "br", "div"],
     ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class"],
   });
 };
