@@ -48,3 +48,17 @@
     @apply bg-transparent text-foreground antialiased;
   }
 }
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+b, strong {
+  font-weight: bold;
+}
